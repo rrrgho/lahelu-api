@@ -1,0 +1,369 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Lahelu Clone ( API Documentation )",
+        "description": "API documentation for my Laravel application",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "api/v1/auth/user/registration": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Register a new user",
+                "operationId": "a25775a0e081b966167d37eafdc1115f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "johndoe@mail.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "johnsecret99"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "api/v1/auth/user/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login a user",
+                "description": "This will return a token which can be used to access all protected APIs. Please note that the token has an expiration time.",
+                "operationId": "88dbc841ebeeae1f61986f6021caddd7",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "wiza.yasmin@example.org"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "1|ViZArgCtEcv3I5VIAI9zPRGaTk3bkFKhDmMqzHwL0aae1863"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "api/v1/auth/user": {
+            "get": {
+                "summary": "Get authenticated user data",
+                "description": "This function is protected by Laravel Sanctum. Please make sure the client passes the token before hitting this route.",
+                "operationId": "4ceecd3764430bd604554eebc44cf4ee",
+                "responses": {
+                    "200": {
+                        "description": "User data retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "api/v1/posts": {
+            "get": {
+                "tags": [
+                    "Meme Posts"
+                ],
+                "summary": "Get paginated posts with their associated user",
+                "operationId": "0d82ca3fa75d1527846c752487fe04a5",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/PostWithUser"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "api/v1/comments": {
+            "get": {
+                "tags": [
+                    "Meme Posts"
+                ],
+                "summary": "Get comments for a post with their associated user",
+                "operationId": "d8c91ebaec65486047030c29c3deb040",
+                "parameters": [
+                    {
+                        "name": "post_id",
+                        "in": "query",
+                        "description": "ID of the post to get comments for",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CommentWithUser"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "User": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "johndoe@mail.com"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "PostWithUser": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "c4751f00-c2fb-be34-5197-6bb66de09faf"
+                    },
+                    "user_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "caption": {
+                        "type": "string",
+                        "example": "24. Impedit quia quo voluptatum sed corrupti."
+                    },
+                    "image": {
+                        "type": "string",
+                        "format": "uri",
+                        "example": "https://cache.lahelu.com/image-PTXnhEi57-22113"
+                    },
+                    "video": {
+                        "type": "string"
+                    },
+                    "like": {
+                        "type": "integer",
+                        "example": 34
+                    },
+                    "unlike": {
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "is_sensitive": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "is_onrule": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "deleted_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/User"
+                    }
+                },
+                "type": "object"
+            },
+            "CommentWithUser": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 79
+                    },
+                    "user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "dbecd449-e7a2-315a-a38a-348b2e38e516"
+                    },
+                    "post_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "55e038cd-87e5-9be4-2aad-8cfcb3867915"
+                    },
+                    "comment_id": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "comment": {
+                        "type": "string",
+                        "example": "This is a comment."
+                    },
+                    "video": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "likes": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "deleted_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/User"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
+            "name": "Meme Posts",
+            "description": "Meme Posts"
+        }
+    ]
+}

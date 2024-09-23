@@ -9,12 +9,60 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 
+
+ 
+
+/**
+ * @OA\Info(
+ *      version="1.0.0",
+ *      title="Lahelu Clone ( API Documentation )",
+ *      description="API documentation for my Laravel application",
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="User",
+ *     type="object",
+ *     properties={
+ *         @OA\Property(property="id", type="integer", format="int64", example=1),
+ *         @OA\Property(property="name", type="string", example="John Doe"),
+ *         @OA\Property(property="email", type="string", format="email", example="johndoe@mail.com"),
+ *         @OA\Property(property="created_at", type="string", format="date-time"),
+ *         @OA\Property(property="updated_at", type="string", format="date-time")
+ *     }
+ * )
+ */
+
 class AuthenticationController extends Controller
 {
     /**
-     * Registration Function
-     * This allows Client to register new user
-     * The client must follow the validation rules
+     * @OA\Post(
+     *     path="api/v1/auth/user/registration",
+     *     summary="Register a new user",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name","email","password"},
+     *             @OA\Property(property="name", type="string", example="John Doe"),
+     *             @OA\Property(property="email", type="string", format="email", example="johndoe@mail.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="johnsecret99")   
+
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="User created successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="user", type="object", ref="#/components/schemas/User")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,   
+
+     *         description="Validation error",   
+
+     *     )
+     * )
      */
     public function registration(Request $request){
         $validator = Validator::make($request->all(), [
@@ -39,10 +87,37 @@ class AuthenticationController extends Controller
     }
 
     /**
-     * Login Function
-     * This will return token
-     * which the token can be used to access all protedted
-     * api, please notes that token has expiration time.
+     * @OA\Post(
+     *     path="api/v1/auth/user/login",
+     *     summary="Login a user",
+     *     tags={"Auth"},
+     *     description="This will return a token which can be used to access all protected APIs. Please note that the token has an expiration time.",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", format="email", example="wiza.yasmin@example.org"),   
+
+     *             @OA\Property(property="password", type="string", format="password", example="password")
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Login successful",   
+
+     *         @OA\JsonContent(
+     *             @OA\Property(property="token", type="string", example="1|ViZArgCtEcv3I5VIAI9zPRGaTk3bkFKhDmMqzHwL0aae1863")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Invalid credentials",
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *     )
+     * )
      */
     public function login(Request $request)
     {
@@ -68,10 +143,17 @@ class AuthenticationController extends Controller
     }
 
     /**
-     * GET User Data Function
-     * This function is being protected by Laravel Sanctum
-     * Please make sure Client passes the token before hit 
-     * the route that accesses this function
+     * @OA\Get(
+     *     path="api/v1/auth/user",
+     *     summary="Get authenticated user data",
+     *     description="This function is protected by Laravel Sanctum. Please make sure the client passes the token before hitting this route.",
+     *     security={{"sanctum": {}}}, 
+     *     @OA\Response(
+     *         response=200,
+     *         description="User data retrieved successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/User")
+     *     )
+     * )
      */
     public function getUserData(Request $request)
     {
